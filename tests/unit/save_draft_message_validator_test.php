@@ -290,13 +290,13 @@ class block_quickmail_save_draft_message_validator_testcase extends advanced_tes
         // Reset all changes automatically after this test.
         $this->resetAfterTest(true);
 
+        $this->update_system_config_value('block_quickmail_message_types_available', 'email');
+
         // Set up a course with a teacher and students.
         list($course, $userteacher, $userstudents) = $this->setup_course_with_teacher_and_students();
 
         // Specify recipients.
         $recipients['included']['user'] = $this->get_user_ids_from_user_array($userstudents);
-
-        $this->update_system_config_value('block_quickmail_message_types_available', 'email');
 
         // Get a compose form submission.
         $composeformdata = $this->get_compose_message_form_submission($recipients, 'message');

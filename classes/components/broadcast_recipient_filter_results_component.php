@@ -32,19 +32,22 @@ class broadcast_recipient_filter_results_component extends component implements 
 
     public $broadcastrecipientfilter;
     public $displayusers;
+    public $draftid;
+    public $resultusercount;
+    public $page;
     public $sortby;
     public $sortdir;
 
     public function __construct($params = []) {
         parent::__construct($params);
 
-        $this->broadcast_recipient_filter = $this->get_param('broadcast_recipient_filter');
-        $this->result_user_count = $this->broadcast_recipient_filter->get_result_user_count();
-        $this->display_users = $this->broadcast_recipient_filter->display_users;
-        $this->draft_id = $this->broadcast_recipient_filter->get_draft_id();
-        $this->page = $this->broadcast_recipient_filter->filter_params['page'];
-        $this->sort_by = $this->broadcast_recipient_filter->filter_params['sort_by'];
-        $this->sort_dir = $this->broadcast_recipient_filter->filter_params['sort_dir'];
+        $this->broadcastrecipientfilter = $this->get_param('broadcast_recipient_filter');
+        $this->resultusercount = $this->broadcastrecipientfilter->get_result_user_count();
+        $this->displayusers = $this->broadcastrecipientfilter->displayusers;
+        $this->draftid = $this->broadcastrecipientfilter->get_draft_id();
+        $this->page = $this->broadcastrecipientfilter->filter_params['page'];
+        $this->sort_by = $this->broadcastrecipientfilter->filter_params['sort_by'];
+        $this->sortdir = $this->broadcastrecipientfilter->filter_params['sort_dir'];
     }
 
     /**
@@ -55,10 +58,10 @@ class broadcast_recipient_filter_results_component extends component implements 
     public function export_for_template($output) {
         $data = (object)[];
 
-        $data->foundUsersHeadingText = block_quickmail_string::get('found_filtered_users', $this->result_user_count);
-        $data->baseSortQueryString = '?draftid=' . $this->draft_id . '&page=' . $this->page;
+        $data->foundUsersHeadingText = block_quickmail_string::get('found_filtered_users', $this->resultusercount);
+        $data->baseSortQueryString = '?draftid=' . $this->draftid . '&page=' . $this->page;
         $data->sortBy = $this->sort_by;
-        $data->isSortedAsc = $this->sort_dir == 'asc';
+        $data->isSortedAsc = $this->sortdir == 'asc';
         $data->firstnameIsSorted = $this->is_attr_sorted('firstname');
         $data->lastnameIsSorted = $this->is_attr_sorted('lastname');
         $data->emailIsSorted = $this->is_attr_sorted('email');
@@ -67,7 +70,7 @@ class broadcast_recipient_filter_results_component extends component implements 
 
         $data->tableRows = [];
 
-        foreach ($this->display_users as $user) {
+        foreach ($this->displayusers as $user) {
             $data->tableRows[] = [
                 'firstname' => $user->firstname,
                 'lastname' => $user->lastname,

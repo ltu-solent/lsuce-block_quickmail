@@ -37,6 +37,7 @@ abstract class repo {
     public $per_page;
     public $uri;
     public $result;
+    public $sortableattrs;
 
     public function __construct($params = []) {
         $this->set_sort($params);

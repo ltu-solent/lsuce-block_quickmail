@@ -193,7 +193,7 @@ class message extends \block_quickmail\persistents\persistent {
             return array();
         }
         $messageid = $this->get('id');
-        $cuser = $this->get('user_id');
+        $cuser = $DB->get_record('user', ['id' => $this->get('user_id')]);
         $course = $DB->get_record('course', ['id' => $this->get('course_id')]);
 
         $recipientuserids = user_repo::get_unique_course_user_ids_from_selected_entities(
@@ -359,7 +359,7 @@ class message extends \block_quickmail\persistents\persistent {
         }
 
         $recipientids = array_reduce($checkedrecipients, function ($carry, $recipient) {
-            $carry[] = $checkedrecipients->get('user_id');
+            $carry[] = $recipient->get('user_id');
 
             return $carry;
         }, []);

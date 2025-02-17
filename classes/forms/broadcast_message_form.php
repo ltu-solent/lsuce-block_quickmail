@@ -94,10 +94,10 @@ class broadcast_message_form extends \moodleform {
         $this->context = $this->_customdata['context'];
         $this->user = $this->_customdata['user'];
         $this->course = $this->_customdata['course'];
-        $this->user_signature_array = $this->_customdata['user_signature_array'];
-        $this->user_default_signature_id = $this->_customdata['user_default_signature_id'];
-        $this->course_config_array = $this->_customdata['course_config_array'];
-        $this->draft_message = $this->_customdata['draft_message'];
+        $this->usersignaturearray = $this->_customdata['user_signature_array'];
+        $this->userdefaultsignatureid = $this->_customdata['user_default_signature_id'];
+        $this->courseconfigarray = $this->_customdata['course_config_array'];
+        $this->draftmessage = $this->_customdata['draft_message'];
 
         // Select recipients.
         $options = [
@@ -123,7 +123,7 @@ class broadcast_message_form extends \moodleform {
         if ($this->is_draft_message()) {
             $mform->setDefault(
                 'subject',
-                $this->draft_message->get('subject')
+                $this->draftmessage->get('subject')
             );
         }
 
@@ -148,7 +148,7 @@ class broadcast_message_form extends \moodleform {
             if ($this->is_draft_message()) {
                 $mform->setDefault(
                     'additional_emails',
-                    implode(', ', $this->draft_message->get_additional_emails(true))
+                    implode(', ', $this->draftmessage->get_additional_emails(true))
                 );
             }
         } else {
@@ -166,7 +166,7 @@ class broadcast_message_form extends \moodleform {
         // Message_editor (textarea).
         // Inject default if draft mesage.
         $defaulttext = $this->is_draft_message()
-            ? $this->draft_message->get('body')
+            ? $this->draftmessage->get('body')
             : '';
 
         $mform->addElement(
@@ -205,14 +205,14 @@ class broadcast_message_form extends \moodleform {
             if ($this->is_draft_message()) {
                 $mform->setDefault(
                     'signature_id',
-                    $this->draft_message->get('signature_id')
+                    $this->draftmessage->get('signature_id')
                 );
 
                 // Otherwise, set to user's default signature, if any.
             } else {
                 $mform->setDefault(
                     'signature_id',
-                    $this->user_default_signature_id
+                    $this->userdefaultsignatureid
                 );
             }
         } else {
@@ -248,8 +248,8 @@ class broadcast_message_form extends \moodleform {
             $mform->setDefault(
                 'message_type',
                 $this->is_draft_message()
-                    ? $this->draft_message->get('message_type')
-                    : $this->course_config_array['default_message_type']
+                    ? $this->draftmessage->get('message_type')
+                    : $this->courseconfigarray['default_message_type']
             );
         } else {
             $mform->addElement(
@@ -258,7 +258,7 @@ class broadcast_message_form extends \moodleform {
             );
             $mform->setDefault(
                 'message_type',
-                $this->course_config_array['default_message_type']
+                $this->courseconfigarray['default_message_type']
             );
         }
 
@@ -300,8 +300,8 @@ class broadcast_message_form extends \moodleform {
         $mform->setDefault(
             'receipt',
             $this->is_draft_message()
-            ? $this->draft_message->get('send_receipt') // Inject default if draft mesage.
-            : ! empty($this->course_config_array['receipt']) // Otherwise, go with this course's config.
+            ? $this->draftmessage->get('send_receipt') // Inject default if draft mesage.
+            : ! empty($this->courseconfigarray['receipt']) // Otherwise, go with this course's config.
         );
 
         // Mentor_copy (radio) - copy mentors of recipients or not?
@@ -327,7 +327,7 @@ class broadcast_message_form extends \moodleform {
             $mform->setDefault(
                 'mentor_copy',
                 $this->is_draft_message()
-                ? $this->draft_message->get('send_to_mentors') // Inject default if draft mesage.
+                ? $this->draftmessage->get('send_to_mentors') // Inject default if draft mesage.
                 : 0 // Otherwise, default to no.
             );
         } else {
@@ -378,7 +378,7 @@ class broadcast_message_form extends \moodleform {
      * @return bool
      */
     private function is_draft_message() {
-        return ! empty($this->draft_message);
+        return ! empty($this->draftmessage);
     }
 
     /**
@@ -396,7 +396,7 @@ class broadcast_message_form extends \moodleform {
      * @return bool
      */
     private function should_show_additional_email_input() {
-        return (bool) $this->course_config_array['additionalemail'];
+        return (bool) $this->courseconfigarray['additionalemail'];
     }
 
     /**
@@ -405,7 +405,7 @@ class broadcast_message_form extends \moodleform {
      * @return bool
      */
     private function should_show_signature_selection() {
-        return count($this->user_signature_array);
+        return count($this->usersignaturearray);
     }
 
     /**
@@ -414,7 +414,7 @@ class broadcast_message_form extends \moodleform {
      * @return bool
      */
     private function should_show_message_type_selection() {
-        return (bool) $this->course_config_array['message_types_available'] == 'all';
+        return (bool) $this->courseconfigarray['message_types_available'] == 'all';
     }
 
     /**
@@ -423,7 +423,7 @@ class broadcast_message_form extends \moodleform {
      * @return bool
      */
     private function should_show_copy_mentor() {
-        return (bool) $this->course_config_array['allow_mentor_copy'];
+        return (bool) $this->courseconfigarray['allow_mentor_copy'];
     }
 
     /**
@@ -432,7 +432,7 @@ class broadcast_message_form extends \moodleform {
      * @return array
      */
     private function get_user_signature_options() {
-        return [0 => 'None'] + $this->user_signature_array;
+        return [0 => 'None'] + $this->usersignaturearray;
     }
 
     /**
@@ -458,7 +458,7 @@ class broadcast_message_form extends \moodleform {
         if (!$this->is_draft_message()) {
             $isoptional = true;
         } else {
-            $isoptional = ! $this->draft_message->get_to_send_in_future();
+            $isoptional = ! $this->draftmessage->get_to_send_in_future();
         }
 
         return [
@@ -491,7 +491,7 @@ class broadcast_message_form extends \moodleform {
             return false;
         }
 
-        return $this->draft_message->get_to_send_in_future();
+        return $this->draftmessage->get_to_send_in_future();
     }
 
     /**
@@ -500,7 +500,7 @@ class broadcast_message_form extends \moodleform {
      * @return int
      */
     private function get_draft_default_send_time() {
-        $tosendat = $this->draft_message->get('to_send_at');
+        $tosendat = $this->draftmessage->get('to_send_at');
 
         return make_timestamp(
             date("Y", $tosendat),

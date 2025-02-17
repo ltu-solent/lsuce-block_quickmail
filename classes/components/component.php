@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 class component {
 
     protected $params;
+    protected $sort_by;
 
     public function __construct($params = []) {
         $this->params = $params;

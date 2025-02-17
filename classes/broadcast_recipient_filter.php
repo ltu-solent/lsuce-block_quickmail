@@ -87,9 +87,9 @@ class block_quickmail_broadcast_recipient_filter {
     public function __construct($filterparams, $extraparams, $draftmessage = null) {
         global $SESSION;
 
-        $this->filter_params = $filterparams;
-        $this->extra_params = $extraparams;
-        $this->draft_message = $draftmessage;
+        $this->filterparams = $filterparams;
+        $this->extraparams = $extraparams;
+        $this->draftmessage = $draftmessage;
 
         // In user/filters/lib.php  this variable $SESSION->user_filtering
         // sometimes is set to '' which causes an error. Instead of changing core from
@@ -99,11 +99,11 @@ class block_quickmail_broadcast_recipient_filter {
             $SESSION->user_filtering = array();
         }
 
-        $this->ufilter = new user_filtering($this->supportedfields, null, $this->extra_params);
+        $this->ufilter = new user_filtering($this->supportedfields, null, $this->extraparams);
 
         // If there is a valid draft message passed, attempt to set the pre-set the filter but only if none already exist.
-        if (!empty($this->draft_message) && ! $this->has_set_filter()) {
-            $this->set_filter_value($this->draft_message->get_broadcast_draft_recipient_filter());
+        if (!empty($this->draftmessage) && ! $this->has_set_filter()) {
+            $this->set_filter_value($this->draftmessage->get_broadcast_draft_recipient_filter());
         }
 
         $this->set_filter_sql_results();
@@ -159,28 +159,28 @@ class block_quickmail_broadcast_recipient_filter {
      */
     private function set_filter_sql_results() {
         list($sql, $params) = $this->ufilter->get_sql_filter();
-        $this->filter_result_sql = $sql;
-        $this->filter_result_params = $params;
+        $this->filterresultsql = $sql;
+        $this->filterresultparams = $params;
     }
 
     /**
      * Sets the filtered "result" users
      */
     public function set_result_users() {
-        $this->result_users = empty($this->filter_result_sql) ? []
-            : get_users_listing($this->filter_params['sort_by'],
-            $this->filter_params['sort_dir'], 0, 0, '', '', '', $this->filter_result_sql, $this->filter_result_params);
+        $this->resultusers = empty($this->filterresultsql) ? []
+            : get_users_listing($this->filterparams['sort_by'],
+            $this->filterparams['sort_dir'], 0, 0, '', '', '', $this->filterresultsql, $this->filterresultparams);
     }
 
     /**
      * Sets the filtered "result" users to display as per "page" and "per_page" settings
      */
     public function set_display_users() {
-        if (empty($this->result_users)) {
-            $this->display_users = [];
+        if (empty($this->resultusers)) {
+            $this->displayusers = [];
         } else {
-            $offset = ($this->filter_params['page'] * $this->filter_params['per_page']) - $this->filter_params['per_page'];
-            $this->display_users = array_slice($this->result_users, $offset, $this->filter_params['per_page'], true);
+            $offset = ($this->filterparams['page'] * $this->filterparams['per_page']) - $this->filterparams['per_page'];
+            $this->displayusers = array_slice($this->resultusers, $offset, $this->filterparams['per_page'], true);
         }
     }
 
@@ -191,9 +191,9 @@ class block_quickmail_broadcast_recipient_filter {
      */
     public function get_result_user_count() {
         if (is_null($this->resultusercount)) {
-            $this->result_user_count = count($this->result_users);
+            $this->resultusercount = count($this->resultusers);
         }
-        return $this->result_user_count;
+        return $this->resultusercount;
     }
 
     /**
@@ -202,7 +202,7 @@ class block_quickmail_broadcast_recipient_filter {
      * @return array
      */
     public function get_result_user_ids() {
-        return array_keys($this->result_users);
+        return array_keys($this->resultusers);
     }
 
     /**
@@ -211,7 +211,7 @@ class block_quickmail_broadcast_recipient_filter {
      * @return int
      */
     public function get_draft_id() {
-        return !empty($this->draft_message) ? $this->draft_message->get('id') : 0;
+        return !empty($this->draftmessage) ? $this->draftmessage->get('id') : 0;
     }
 
      // Output Rendering.
@@ -241,12 +241,12 @@ class block_quickmail_broadcast_recipient_filter {
     public function render_paging_bar() {
         global $OUTPUT;
         echo $OUTPUT->paging_bar($this->get_result_user_count(),
-            $this->filter_params['page'], $this->filter_params['per_page'],
+            $this->filterparams['page'], $this->filterparams['per_page'],
             new moodle_url('/blocks/quickmail/broadcast.php', [
                 'draftid' => $this->get_draft_id(),
-                'sort_by' => $this->filter_params['sort_by'],
-                'sort_dir' => $this->filter_params['sort_dir'],
-                'per_page' => $this->filter_params['per_page'],
+                'sort_by' => $this->filterparams['sort_by'],
+                'sort_dir' => $this->filterparams['sort_dir'],
+                'per_page' => $this->filterparams['per_page'],
             ]
         ));
     }

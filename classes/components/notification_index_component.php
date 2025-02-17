@@ -45,7 +45,7 @@ class notification_index_component extends component implements \renderable {
         $this->user = $this->get_param('user');
         $this->courseid = $this->get_param('courseid');
         $this->sort_by = $this->get_param('sort_by');
-        $this->sort_dir = $this->get_param('sort_dir');
+        $this->sortdir = $this->get_param('sort_dir');
     }
 
     /**
@@ -58,7 +58,7 @@ class notification_index_component extends component implements \renderable {
 
         $data->courseId = $this->courseid;
         $data->sortBy = $this->sort_by;
-        $data->isSortedAsc = $this->sort_dir == 'asc';
+        $data->isSortedAsc = $this->sortdir == 'asc';
         $data->nameIsSorted = $this->is_attr_sorted('name');
         $data->modelIsSorted = $this->is_attr_sorted('model');
         $data->enabledIsSorted = $this->is_attr_sorted('enabled');

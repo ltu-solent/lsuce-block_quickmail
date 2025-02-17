@@ -48,9 +48,9 @@ class migrator {
 
         $this->db = $DB;
         $this->cfg = $CFG;
-        $this->site_id = SITEID;
-        $this->chunk_size = $this->get_configured_chunk_size();
-        $this->migrated_count = 0;
+        $this->siteid = SITEID;
+        $this->chunksize = $this->get_configured_chunk_size();
+        $this->migratedcount = 0;
     }
 
     /**
@@ -160,14 +160,14 @@ class migrator {
      * @throws chunk_size_met_exception
      */
     public function migrate($isdraft, $isadminmessage) {
-        if (!empty($this->chunk_size)) {
+        if (!empty($this->chunksize)) {
             // While we can pull an unmigrated message of the given status type (beginning with latest).
             while ($record = $this->find_latest_unmigrated($isdraft, $isadminmessage)) {
                 $this->create_message($isdraft, $isadminmessage, $record);
 
                 $this->mark_old_record_as_migrated($isdraft, $record);
 
-                $this->migrated_count++;
+                $this->migratedcount++;
 
                 $this->check_chunk_size();
             }
@@ -364,8 +364,8 @@ class migrator {
         $sql = 'select * from ' . $this->get_raw_source_table_name($isdraft) . ' where has_migrated = 0';
 
         $sql .= $isadminmessage
-            ? ' and courseid = ' . $this->site_id
-            : ' and courseid != ' . $this->site_id;
+            ? ' and courseid = ' . $this->siteid
+            : ' and courseid != ' . $this->siteid;
 
         $sql .= ' order by id desc limit 1;';
 
@@ -414,7 +414,7 @@ class migrator {
      * @throws chunk_size_met_exception
      */
     private function check_chunk_size() {
-        if ($this->migrated_count >= $this->chunk_size) {
+        if ($this->migratedcount >= $this->chunksize) {
             throw new chunk_size_met_exception;
         }
     }

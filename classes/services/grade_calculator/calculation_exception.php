@@ -33,8 +33,8 @@ class calculation_exception extends \Exception {
 
     public function __construct($message, $courseid, $userid = null) {
         $this->message = $message;
-        $this->course_id = $courseid;
-        $this->user_id = $userid;
+        $this->courseid = $courseid;
+        $this->userid = $userid;
     }
 
 }

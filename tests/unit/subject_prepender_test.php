@@ -47,11 +47,11 @@ class block_quickmail_subject_prepender_testcase extends advanced_testcase {
     public function test_format_course_subject_with_idnumber_setting() {
         $this->resetAfterTest(true);
 
+        $this->update_system_config_value('block_quickmail_prepend_class', 'idnumber');
+
         $course = $this->getDataGenerator()->create_course();
 
         $subject = 'Hello world!';
-
-        $this->update_system_config_value('block_quickmail_prepend_class', 'idnumber');
 
         $formattedsubject = subject_prepender::format_course_subject($course, $subject);
 
@@ -61,11 +61,11 @@ class block_quickmail_subject_prepender_testcase extends advanced_testcase {
     public function test_format_course_subject_with_shortname_setting() {
         $this->resetAfterTest(true);
 
+        $this->update_system_config_value('block_quickmail_prepend_class', 'shortname');
+
         $course = $this->getDataGenerator()->create_course();
 
         $subject = 'Hello world!';
-
-        $this->update_system_config_value('block_quickmail_prepend_class', 'shortname');
 
         $formattedsubject = subject_prepender::format_course_subject($course, $subject);
 
@@ -75,11 +75,11 @@ class block_quickmail_subject_prepender_testcase extends advanced_testcase {
     public function test_format_course_subject_with_fullname_setting() {
         $this->resetAfterTest(true);
 
+        $this->update_system_config_value('block_quickmail_prepend_class', 'fullname');
+
         $course = $this->getDataGenerator()->create_course();
 
         $subject = 'Hello world!';
-
-        $this->update_system_config_value('block_quickmail_prepend_class', 'fullname');
 
         $formattedsubject = subject_prepender::format_course_subject($course, $subject);
 

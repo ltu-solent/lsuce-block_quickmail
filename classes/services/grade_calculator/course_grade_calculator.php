@@ -43,7 +43,6 @@ class course_grade_calculator {
      * @param int  $courseid    course id
      */
     public function __construct($courseid) {
-        $this->course_id = $courseid;
         $this->courseid = $courseid;
         $this->set_context();
         $this->set_grade_item();
@@ -72,39 +71,39 @@ class course_grade_calculator {
      * @return mixed
      */
     public function get_user_course_grade($userid, $displaytype = 'round') {
-        if ($this->course_grade_item->hidden) {
+        if ($this->coursegradeitem->hidden) {
             $this->throw_calculation_exception($userid);
         }
 
         $usergradegrade = new \grade_grade([
-            'itemid' => $this->course_grade_item->id,
+            'itemid' => $this->coursegradeitem->id,
             'userid' => $userid
         ]);
 
-        $usergradegrade->grade_item =& $this->course_grade_item;
+        $usergradegrade->grade_item =& $this->coursegradeitem;
 
         $finalgrade = $usergradegrade->finalgrade;
 
         $report = $this->get_course_grade_report_for_user($userid);
 
-        if (!has_capability('moodle/grade:viewhidden', $this->course_context, $userid) && !is_null($finalgrade)) {
+        if (!has_capability('moodle/grade:viewhidden', $this->coursecontext, $userid) && !is_null($finalgrade)) {
             $adjustedgrade = $report->get_blank_hidden_total_and_adjust_bounds(
-                $this->course_id,
-                $this->course_grade_item,
+                $this->courseid,
+                $this->coursegradeitem,
                 $finalgrade
             );
 
-            $this->course_grade_item->grademax = $adjustedgrade['grademax'];
-            $this->course_grade_item->grademin = $adjustedgrade['grademin'];
+            $this->coursegradeitem->grademax = $adjustedgrade['grademax'];
+            $this->coursegradeitem->grademin = $adjustedgrade['grademin'];
         } else if (!is_null($finalgrade)) {
             $adjustedgrade = $report->get_blank_hidden_total_and_adjust_bounds(
-                $this->course_id,
-                $this->course_grade_item,
+                $this->courseid,
+                $this->coursegradeitem,
                 $finalgrade
             );
 
-            $this->course_grade_item->grademin = $usergradegrade->get_grade_min();
-            $this->course_grade_item->grademax = $usergradegrade->get_grade_max();
+            $this->coursegradeitem->grademin = $usergradegrade->get_grade_min();
+            $this->coursegradeitem->grademax = $usergradegrade->get_grade_max();
         }
 
         if (!isset($adjustedgrade)) {
@@ -115,7 +114,7 @@ class course_grade_calculator {
         $displaydecimals = null;
 
         $totalgrade = grade_format_gradevalue($adjustedgrade['grade'],
-                          $this->course_grade_item,
+                          $this->coursegradeitem,
                           $uselocalizeddecimal,
                           $this->get_display_type($displaytype),
                           $displaydecimals);
@@ -134,8 +133,7 @@ class course_grade_calculator {
      * Sets the course context
      */
     private function set_context() {
-        $this->course_context = \context_course::instance($this->course_id);
-        $this->coursecontext = \context_course::instance($this->course_id);
+        $this->coursecontext = \context_course::instance($this->courseid);
     }
 
     /**
@@ -145,11 +143,10 @@ class course_grade_calculator {
      */
     private function set_grade_item() {
         try {
-            if (!$coursegradeitem = \grade_item::fetch_course_item($this->course_id)) {
+            if (!$coursegradeitem = \grade_item::fetch_course_item($this->courseid)) {
                 throw new \Exception;
             }
 
-            $this->course_grade_item = $coursegradeitem;
             $this->coursegradeitem = $coursegradeitem;
         } catch (\Exception $e) {
             $this->throw_calculation_exception(null, 'Could not fetch the grade item for the course.');
@@ -165,7 +162,7 @@ class course_grade_calculator {
      */
     private function get_course_grade_report_for_user($userid) {
         try {
-            return new course_grade_report($this->course_id, $this->course_context, $userid);
+            return new course_grade_report($this->courseid, $this->coursecontext, $userid);
         } catch (\Exception $e) {
             $this->throw_calculation_exception($userid);
         }
@@ -207,7 +204,7 @@ class course_grade_calculator {
                          $userid = null,
                          // TODO: Localize these strings.
                          $message = 'Could not calculate final course grade for this user.') {
-        throw new calculation_exception('Could not fetch the grade item for the course.', $this->course_id, $userid);
+        throw new calculation_exception('Could not fetch the grade item for the course.', $this->courseid, $userid);
     }
 
 }

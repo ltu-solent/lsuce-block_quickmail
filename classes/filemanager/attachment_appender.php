@@ -39,6 +39,7 @@ class attachment_appender {
     public $message;
     public $body;
     public $course_context;
+    public $links;
     public $message_attachments;
 
     public function __construct(message $message, $body) {
